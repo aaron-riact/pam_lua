@@ -3,18 +3,7 @@
 ////
 
 // I/O
-static int converse(const pam_handle_t *pamh, int nargs, struct pam_message **message, struct pam_response **response) {
-	struct pam_conv *conv;
-
-	int retval = pam_get_item(pamh, PAM_CONV, (const void**)&conv);
-	if (retval == PAM_SUCCESS) {
-		retval = conv->conv(nargs, (const struct pam_message**)message, response, conv->appdata_ptr);
-	}
-
-	return retval;
-}
-
-static int converse2(const pam_handle_t *pamh, int nargs, const struct pam_message **message, struct pam_response **response) {
+static int converse(const pam_handle_t *pamh, int nargs, const struct pam_message **message, struct pam_response **response) {
 	struct pam_conv *conv;
 
 	int retval = pam_get_item(pamh, PAM_CONV, (const void**)&conv);
@@ -28,16 +17,10 @@ static int converse2(const pam_handle_t *pamh, int nargs, const struct pam_messa
 
 static int pamh_readline(const pam_handle_t *pamh, int visible, const char* str, char* *res) {
 	// Prepare mesg structs
-	struct pam_message mesg[1], *pmesg[1];
-	pmesg[0] = &mesg[0];
-
-	if (visible != 0) {
-		mesg[0].msg_style = PAM_PROMPT_ECHO_ON;
-	} else {
-		mesg[0].msg_style = PAM_PROMPT_ECHO_OFF;
-	}
-
-	mesg[0].msg = (char*)str;
+	const struct pam_message mesg[1] = {
+		{ .msg_style = (visible != 0 ? PAM_PROMPT_ECHO_ON : PAM_PROMPT_ECHO_OFF), .msg = str }
+	};
+	const struct pam_message *pmesg[1] = { &mesg[0] };
 
 	// Ask
 	int retval;
@@ -61,33 +44,23 @@ static int pamh_readline(const pam_handle_t *pamh, int visible, const char* str,
 
 static int pamh_info(const pam_handle_t *pamh, const char* str) {
 	// Prepare mesg structs
-	struct pam_message mesg[1], *pmesg[1];
-	pmesg[0] = &mesg[0];
-
-	mesg[0].msg_style = PAM_TEXT_INFO;
-	mesg[0].msg = (char*)str;
+	const struct pam_message mesg[1] = {
+		{ .msg_style = PAM_TEXT_INFO, .msg = str }
+	};
+	const struct pam_message *pmesg[1] = { &mesg[0] };
 
 	// Display text
-	int retval;
-	struct pam_response *resp;
-	if ((retval = converse(pamh, 1, pmesg, &resp)) != PAM_SUCCESS) {
-		free(resp);
-		return retval;
-	}
-	free(resp);
-	return PAM_SUCCESS;
+	return converse(pamh, 1, pmesg, NULL);
 }
 
 static int pamh_error(const pam_handle_t *pamh, const char* str) {
-	// Prepare mesg structs
 	const struct pam_message mesg[1] = {
 		{ .msg_style = PAM_ERROR_MSG, .msg = str }
 	};
 	const struct pam_message *pmesg[1] = { &mesg[0] };
 
 	// send error
-	const struct pam_response *resp = NULL;
-	return converse2(pamh, 1, pmesg, NULL);
+	return converse(pamh, 1, pmesg, NULL);
 }
 
 // Items
