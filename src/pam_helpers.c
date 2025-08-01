@@ -41,8 +41,10 @@ static int pamh_info(const pam_handle_t *pamh, const char* str) {
 	};
 	const struct pam_message *pmesg[1] = { &mesg[0] };
 
-	// Display text
-	return converse(pamh, 1, pmesg, NULL);
+	struct pam_response *resp = NULL;
+	int retval = converse(pamh, 1, pmesg, &resp);
+	if (resp) free(resp);
+	return retval;
 }
 
 static int pamh_error(const pam_handle_t *pamh, const char* str) {
@@ -51,8 +53,10 @@ static int pamh_error(const pam_handle_t *pamh, const char* str) {
 	};
 	const struct pam_message *pmesg[1] = { &mesg[0] };
 
-	// send error
-	return converse(pamh, 1, pmesg, NULL);
+	struct pam_response *resp = NULL;
+	int retval = converse(pamh, 1, pmesg, &resp);
+	if (resp) free(resp);
+	return retval;
 }
 
 // Items
