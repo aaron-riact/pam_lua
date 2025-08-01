@@ -18,28 +18,32 @@ static int converse(const pam_handle_t *pamh, int nargs, const struct pam_messag
 static int pamh_readline(const pam_handle_t *pamh, int visible, const char* str, char* *res) {
 	// Prepare mesg structs
 	const struct pam_message mesg[1] = {
-		{ .msg_style = (visible != 0 ? PAM_PROMPT_ECHO_ON : PAM_PROMPT_ECHO_OFF), .msg = str }
+		{ .msg_style = visible ? PAM_PROMPT_ECHO_ON : PAM_PROMPT_ECHO_OFF, .msg = str }
 	};
 	const struct pam_message *pmesg[1] = { &mesg[0] };
 
-	// Ask
-	int retval;
-	struct pam_response *resp;
-	if ((retval = converse(pamh, 1, pmesg, &resp)) != PAM_SUCCESS) {
-		return retval;
+	struct pam_response *resp = NULL;
+	int retval = converse(pamh, 1, pmesg, &resp);
+	if (retval != PAM_SUCCESS || resp == NULL || resp[0].resp == NULL) {
+		if (resp) {
+			if (resp[0].resp) free(resp[0].resp);
+			free(resp);
+		}
+		return PAM_CONV_ERR;
 	}
 
-	if (resp) {
-		char* tres = resp[0].resp;
-		*res = calloc(strlen(tres)+1, sizeof(char));
-		if (*res == NULL)
-			return PAM_BUF_ERR; // allocation failure
-		strcpy(*res, tres);
+	// Allocate and copy user input
+	*res = strdup(resp[0].resp);
+	if (*res == NULL) {
 		free(resp[0].resp);
-		return PAM_SUCCESS;
+		free(resp);
+		return PAM_BUF_ERR;
 	}
+
+	// Clean up
+	free(resp[0].resp);
 	free(resp);
-	return PAM_CONV_ERR;
+	return PAM_SUCCESS;
 }
 
 static int pamh_info(const pam_handle_t *pamh, const char* str) {
