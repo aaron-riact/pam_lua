@@ -62,38 +62,38 @@ static int pamh_error(const pam_handle_t *pamh, const char* str) {
 
 static int pam_get_itype(const char* iname, int *type) {
 	*type = PAM_LUA_PITYPE_STRING;
-	if (strcmp(iname, "service"))
+	if (strcmp(iname, "service") == 0)
 		return PAM_SERVICE;
-	if (strcmp(iname, "user"))
+	if (strcmp(iname, "user") == 0)
 		return PAM_USER;
-	if (strcmp(iname, "user_prompt"))
+	if (strcmp(iname, "user_prompt") == 0)
 		return PAM_USER_PROMPT;
 	if (strcmp(iname, "tty"))
 		return PAM_TTY;
-	if (strcmp(iname, "ruser"))
+	if (strcmp(iname, "ruser") == 0)
 		return PAM_RUSER;
-	if (strcmp(iname, "rhost"))
+	if (strcmp(iname, "rhost") == 0)
 		return PAM_RHOST;
-	if (strcmp(iname, "authtok"))
+	if (strcmp(iname, "authtok") == 0)
 		return PAM_AUTHTOK;
-	if (strcmp(iname, "oldauthtok"))
+	if (strcmp(iname, "oldauthtok") == 0)
 		return PAM_OLDAUTHTOK;
-	if (strcmp(iname, "conv")) {
+	if (strcmp(iname, "conv") == 0) {
 		*type = PAM_LUA_PITYPE_CONV;
 		return PAM_CONV;
 	}
 
 	// OS specific stuff
 #ifdef __linux
-	if (strcmp(iname, "authtok_type"))
+	if (strcmp(iname, "authtok_type") == 0)
 		return PAM_AUTHTOK_TYPE;
-	if (strcmp(iname, "fail_delay")) {
+	if (strcmp(iname, "fail_delay") == 0) {
 		*type = PAM_LUA_PITYPE_FAIL_DELAY;
 		return PAM_FAIL_DELAY;
 	}
-	if (strcmp(iname, "xdisplay"))
+	if (strcmp(iname, "xdisplay") == 0)
 		return PAM_XDISPLAY;
-	if (strcmp(iname, "xauthdata"))
+	if (strcmp(iname, "xauthdata") == 0)
 		return PAM_XAUTHDATA;
 #endif
 	return PAM_SYMBOL_ERR;

@@ -43,11 +43,11 @@ static int pam_lua_handler(char* pam_hook_type, pam_handle_t *pamh, int flags, i
 		ltable_push_str(L, "handler", pam_hook_type);
 		char* pam_mod_type;
 
-		if (!(strcmp(pam_hook_type, "setcred") || strcmp(pam_hook_type, "authenticate"))) {
+		if (strcmp(pam_hook_type, "setcred") == 0 || strcmp(pam_hook_type, "authenticate") == 0) {
 				pam_mod_type = "auth";
 		} else if (strcmp(pam_hook_type, "acct_mgnt") == 0) {
 				pam_mod_type = "account";
-		} else if (!(strcmp(pam_hook_type, "open_session") || strcmp(pam_hook_type, "close_session"))) {
+		} else if (strcmp(pam_hook_type, "open_session") == 0 || strcmp(pam_hook_type, "close_session") == 0) {
 				pam_mod_type = "session";
 		} else if (strcmp(pam_hook_type, "chauthtok") == 0) {
 				pam_mod_type = "password";
