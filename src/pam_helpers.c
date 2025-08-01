@@ -25,24 +25,12 @@ static int pamh_readline(const pam_handle_t *pamh, int visible, const char* str,
 	struct pam_response *resp = NULL;
 	int retval = converse(pamh, 1, pmesg, &resp);
 	if (retval != PAM_SUCCESS || resp == NULL || resp[0].resp == NULL) {
-		if (resp) {
-			if (resp[0].resp) free(resp[0].resp);
-			free(resp);
-		}
+		if (resp) free(resp);
 		return PAM_CONV_ERR;
 	}
 
-	// Allocate and copy user input
-	*res = strdup(resp[0].resp);
-	if (*res == NULL) {
-		free(resp[0].resp);
-		free(resp);
-		return PAM_BUF_ERR;
-	}
-
-	// Clean up
-	free(resp[0].resp);
-	free(resp);
+	*res = resp[0].resp;  // Transfer ownership of the string only
+	free(resp);           // Free the response array (but keep the string)
 	return PAM_SUCCESS;
 }
 
