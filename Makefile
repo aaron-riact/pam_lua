@@ -19,7 +19,7 @@ debug: CFLAGS+= -ggdb
 debug: pam_lua.so
 
 # Rules
-pam_lua.so: src/pam_lua.c src/bootcode.h
+pam_lua.so: src/pam_lua.c src/bootcode.h src/pam_helpers.c
 	${CC} -pedantic -std=c99 -shared -rdynamic -fPIC ${CFLAGS} -o $@ src/pam_lua.c ${LDFLAGS}
 
 src/bin2c: src/bin2c.c
