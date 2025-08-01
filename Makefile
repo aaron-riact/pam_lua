@@ -20,7 +20,7 @@ debug: pam_lua.so
 
 # Rules
 pam_lua.so: src/pam_lua.c src/bootcode.h
-	${CC} -pedantic -std=c99 -shared -rdynamic -fPIC ${CFLAGS} ${LDFLAGS} -o $@ src/pam_lua.c
+	${CC} -pedantic -std=c99 -shared -rdynamic -fPIC ${CFLAGS} -o $@ src/pam_lua.c ${LDFLAGS}
 
 src/bin2c: src/bin2c.c
 	${CC} ${CFLAGS} -Wno-unused-result -o $@ src/bin2c.c
